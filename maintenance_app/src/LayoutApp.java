@@ -3,373 +3,338 @@ import java.util.*;
 
 public class LayoutApp {
 
-    static final String URL="jdbc:postgresql://localhost:5432/test";
-    static final String USER="postgres";
-    static final String PASS="Amirtha@134"; // change
-
-    static Connection getCon() throws Exception {
-        Class.forName("org.postgresql.Driver");
-        return DriverManager.getConnection(URL,USER,PASS);
-    }
-
-    // ---------- LOGIN ----------
-    static boolean adminLogin(String u,String p){
-        try(Connection con=getCon()){
-            PreparedStatement ps=con.prepareStatement(
-            "SELECT 1 FROM admin_login WHERE username=? AND password=?");
-            ps.setString(1,u); ps.setString(2,p);
-            return ps.executeQuery().next();
-        }catch(Exception e){e.printStackTrace();}
-        return false;
-    }
-
-    static int ownerLogin(String u,String p){
-        try(Connection con=getCon()){
-            PreparedStatement ps=con.prepareStatement(
-            "SELECT owner_id FROM owners WHERE username=? AND password=?");
-            ps.setString(1,u); ps.setString(2,p);
-            ResultSet rs=ps.executeQuery();
-            if(rs.next()) return rs.getInt(1);
-        }catch(Exception e){e.printStackTrace();}
-        return -1;
-    }
-
-    // ---------- OWNER ----------
-    static void addSite(int ownerId){
-        try(Connection con=getCon()){
-            Scanner sc=new Scanner(System.in);
-            System.out.print("Type:  (Villa/Apartment/House/Open):");
-            String type=sc.nextLine();
-            String status = type.equalsIgnoreCase("Open") ? "OPEN" : "OCCUPIED";
-
-            System.out.print("Size:");
-            String size=sc.nextLine();
-            System.out.print("Sqft:");
-            int sqft=sc.nextInt();
- 
-    
-             PreparedStatement ps = con.prepareStatement(
-        "INSERT INTO site_requests(owner_id,site_type,size,sqft,status) VALUES(?,?,?,?,?)");
-
-        ps.setInt(1, ownerId);
-        ps.setString(2, type);
-        ps.setString(3, size);
-        ps.setInt(4, sqft);
-        ps.setString(5, "PENDING");
-            ps.executeUpdate();
-
-            System.out.println("Sent for Approval");
-        }catch(Exception e){e.printStackTrace();}
-    }
-    
-    static void viewMySite(int ownerId){
-        try(Connection con=getCon()){
-            PreparedStatement ps=con.prepareStatement(
-            "SELECT site_type,size,sqft FROM sites WHERE owner_id=?");
-            ps.setInt(1,ownerId);
-            ResultSet rs=ps.executeQuery();
-
-            boolean found=false;
-            while(rs.next()){
-                found=true;
-                System.out.println(rs.getString(1)+" "+rs.getString(2)+" "+rs.getInt(3));
-            }
-            if(!found) System.out.println("No Approved Sites");
-        }catch(Exception e){e.printStackTrace();}
-    }
-   static void viewMyRequests(int ownerId){
-    try(Connection con=getCon()){
-        PreparedStatement ps=con.prepareStatement(
-        "SELECT site_type,size,sqft,status FROM site_requests WHERE owner_id=?");
-        ps.setInt(1,ownerId);
-        ResultSet rs=ps.executeQuery();
-
-        boolean found=false;
-        while(rs.next()){
-            found=true;
-            System.out.println(
-            rs.getString(1)+" "+
-            rs.getString(2)+" "+
-            rs.getInt(3)+" "+
-            rs.getString(4));
+    // ---------------- DB CONNECTION ----------------
+    static class DBUtil {
+        static Connection getConnection() throws Exception {
+            String url = "jdbc:postgresql://localhost:5432/layoutdb";
+            String user = "postgres";
+            String pass = "Amirtha@134";
+            Class.forName("org.postgresql.Driver");
+            return DriverManager.getConnection(url, user, pass);
         }
-        if(!found) System.out.println("No Requests");
-    }catch(Exception e){e.printStackTrace();}
-}
-
-
-    // ---------- ADMIN ----------
-    static void viewAllSites(){
-        try(Connection con=getCon()){
-            ResultSet rs=con.createStatement().executeQuery("SELECT * FROM sites");
-            while(rs.next()){
-                System.out.println(
-                rs.getInt("site_id")+" "+
-                rs.getInt("owner_id")+" "+
-                rs.getString("site_type")+" "+
-                rs.getString("size")+" "+
-                rs.getInt("sqft"));
-            }
-        }catch(Exception e){e.printStackTrace();}
     }
 
-   static void addOwner(){
-    try(Connection con=getCon()){
-        Scanner sc=new Scanner(System.in);
+    // ---------------- MODELS ----------------
+    static class User {
+        int id;
+        String username;
+        String role;
+    }
 
-        System.out.print("Name:");
-        String name=sc.nextLine();
-        System.out.print("Username:");
-        String user=sc.nextLine();
-        System.out.print("Password:");
-        String pass=sc.nextLine();
+    static class Site {
+        int siteNo;
+        String dimension;
+        int area;
+        String propertyType;
+        int perSqft;
+        int totalAmount;
+        int balance;
+        String status;
+        int ownerId;
+        String siteType;
+    }
 
-        PreparedStatement ps=con.prepareStatement(
-        "INSERT INTO owners(name,username,password) VALUES(?,?,?)");
-        ps.setString(1,name);
-        ps.setString(2,user);
-        ps.setString(3,pass);
-        ps.executeUpdate();
+    // ---------------- DAO INTERFACES ----------------
+    interface UserDAO {
+        User login(String u, String p);
+        void registerOwner(String u, String p);
+    }
 
-        System.out.println("Owner Created");
-    }catch(Exception e){e.printStackTrace();}
-}
+    interface SiteDAO {
+        List<Site> getAllSites();
+        Site getSite(int siteNo);
+        void assignOwner(int siteNo, int ownerId, String propertyType);
+        void collectPayment(int siteNo, int amount);
+        List<Site> getPendingSites();
+        List<Site> getOwnerSites(int ownerId);
+        void requestUpdate(int siteNo, String propertyType);
+        void approveUpdate(int siteNo, boolean approve);
+    }
 
-    static void showOwners(){
-    try(Connection con=getCon()){
-        ResultSet rs=con.createStatement().executeQuery(
-        "SELECT owner_id,name,username FROM owners");
+    // ---------------- DAO IMPLEMENTATIONS ----------------
+    static class UserDAOImpl implements UserDAO {
 
-        while(rs.next()){
-            System.out.println(
-            rs.getInt(1)+" "+
-            rs.getString(2)+" "+
-            rs.getString(3));
+        public User login(String u, String p) {
+            try (Connection con = DBUtil.getConnection()) {
+                String sql = "SELECT * FROM users WHERE username=? AND password=?";
+                PreparedStatement ps = con.prepareStatement(sql);
+                ps.setString(1, u);
+                ps.setString(2, p);
+                ResultSet rs = ps.executeQuery();
+
+                if (rs.next()) {
+                    User user = new User();
+                    user.id = rs.getInt("user_id");
+                    user.username = rs.getString("username");
+                    user.role = rs.getString("role");
+                    return user;
+                }
+            } catch (Exception e) { e.printStackTrace(); }
+            return null;
         }
-    }catch(Exception e){e.printStackTrace();}
-}
 
+        public void registerOwner(String u, String p) {
+            try (Connection con = DBUtil.getConnection()) {
+                String sql = "INSERT INTO users(username,password,role) VALUES(?,?, 'OWNER')";
+                PreparedStatement ps = con.prepareStatement(sql);
+                ps.setString(1, u);
+                ps.setString(2, p);
+                ps.executeUpdate();
+                System.out.println("Owner Registered");
+            } catch (Exception e) { e.printStackTrace(); }
+        }
+    }
 
-     static void removeOwner(){
-    try(Connection con=getCon()){
-        Scanner sc=new Scanner(System.in);
-        showOwners();
-        System.out.print("Enter Owner ID to Remove: ");
-        int id=sc.nextInt();
+    static class SiteDAOImpl implements SiteDAO {
 
-        // Step 1 – delete pending requests
-        PreparedStatement ps1=con.prepareStatement(
-        "DELETE FROM site_requests WHERE owner_id=?");
-        ps1.setInt(1,id);
-        ps1.executeUpdate();
+        public List<Site> getAllSites() {
+            List<Site> list = new ArrayList<>();
+            try (Connection con = DBUtil.getConnection()) {
+                ResultSet rs = con.createStatement().executeQuery("SELECT * FROM sites");
+                while (rs.next()) list.add(map(rs));
+            } catch (Exception e) { e.printStackTrace(); }
+            return list;
+        }
 
-        // Step 2 – delete approved sites
-        PreparedStatement ps2=con.prepareStatement(
-        "DELETE FROM sites WHERE owner_id=?");
-        ps2.setInt(1,id);
-        ps2.executeUpdate();
+        public Site getSite(int siteNo) {
+            try (Connection con = DBUtil.getConnection()) {
+                PreparedStatement ps = con.prepareStatement("SELECT * FROM sites WHERE site_no=?");
+                ps.setInt(1, siteNo);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) return map(rs);
+            } catch (Exception e) { e.printStackTrace(); }
+            return null;
+        }
 
-        // Step 3 – delete owner
-        PreparedStatement ps3=con.prepareStatement(
-        "DELETE FROM owners WHERE owner_id=?");
-        ps3.setInt(1,id);
-        int rows=ps3.executeUpdate();
+        public void assignOwner(int siteNo, int ownerId, String propertyType) {
+            try (Connection con = DBUtil.getConnection()) {
+                String sql =
+                    "UPDATE sites SET owner_id=?, property_type=?, site_type='OCCUPIED', " +
+                    "per_sqft=9, total_amount=area*9, balance=area*9 WHERE site_no=?";
+                PreparedStatement ps = con.prepareStatement(sql);
+                ps.setInt(1, ownerId);
+                ps.setString(2, propertyType);
+                ps.setInt(3, siteNo);
+                ps.executeUpdate();
+            } catch (Exception e) { e.printStackTrace(); }
+        }
 
-        if(rows>0)
-            System.out.println("Owner Removed Successfully");
-        else
-            System.out.println("Owner Not Found");
+        public void collectPayment(int siteNo, int amount) {
+            try (Connection con = DBUtil.getConnection()) {
 
-    }catch(Exception e){
+                // Insert payment
+                PreparedStatement ps1 = con.prepareStatement(
+                    "INSERT INTO payments(site_no,paid_amount) VALUES(?,?)");
+                ps1.setInt(1, siteNo);
+                ps1.setInt(2, amount);
+                ps1.executeUpdate();
+
+                // Update balance
+                PreparedStatement ps2 = con.prepareStatement(
+                    "UPDATE sites SET balance=balance-? WHERE site_no=?");
+                ps2.setInt(1, amount);
+                ps2.setInt(2, siteNo);
+                ps2.executeUpdate();
+
+            } catch (Exception e) { e.printStackTrace(); }
+        }
+
+        public List<Site> getPendingSites() {
+            List<Site> list = new ArrayList<>();
+            try (Connection con = DBUtil.getConnection()) {
+                ResultSet rs = con.createStatement()
+                    .executeQuery("SELECT * FROM sites WHERE status='PENDING'");
+                while (rs.next()) list.add(map(rs));
+            } catch (Exception e) { e.printStackTrace(); }
+            return list;
+        }
+
+        public List<Site> getOwnerSites(int ownerId) {
+            List<Site> list = new ArrayList<>();
+            try (Connection con = DBUtil.getConnection()) {
+                PreparedStatement ps = con.prepareStatement(
+                    "SELECT * FROM sites WHERE owner_id=?");
+                ps.setInt(1, ownerId);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) list.add(map(rs));
+            } catch (Exception e) { e.printStackTrace(); }
+            return list;
+        }
+
+        // owner request
+        public void requestUpdate(int siteNo, String propertyType) {
+            try (Connection con = DBUtil.getConnection()) {
+                PreparedStatement ps = con.prepareStatement(
+                    "UPDATE sites SET property_type=? WHERE site_no=?");
+                ps.setString(1, propertyType);
+                ps.setInt(2, siteNo);
+                ps.executeUpdate();
+            } catch (Exception e) { e.printStackTrace(); }
+        }
+
+        // admin approval
+       
+        public void approveUpdate(int siteNo, boolean approve) {
+            try (Connection con = DBUtil.getConnection()) {
+                if (approve) {
+                    con.createStatement().executeUpdate(
+                        "UPDATE sites SET per_sqft=9,total_amount=area*9,balance=area*9 WHERE site_no=" + siteNo);
+                }
+            } catch (Exception e) { e.printStackTrace(); }
+        }
+
+        private Site map(ResultSet rs) throws Exception {
+            Site s = new Site();
+            s.siteNo = rs.getInt("site_no");
+            s.dimension = rs.getString("dimension");
+            s.area = rs.getInt("area");
+            s.propertyType = rs.getString("property_type");
+            s.perSqft = rs.getInt("per_sqft");
+            s.totalAmount = rs.getInt("total_amount");
+            s.balance = rs.getInt("balance");
+            s.status = rs.getString("status");
+            s.ownerId = rs.getInt("owner_id");
+            s.siteType = rs.getString("site_type");
+            return s;
+        }
+    }
+     static void showAllOwners() {
+    try (Connection con = DBUtil.getConnection()) {
+        ResultSet rs = con.createStatement().executeQuery(
+            "SELECT user_id, username FROM users WHERE role='OWNER'");
+
+        System.out.println("\nAVAILABLE OWNERS:");
+        System.out.println("----------------------------");
+        while (rs.next()) {
+            System.out.println("ID: " + rs.getInt("user_id") +
+                               " | Username: " + rs.getString("username"));
+        }
+        System.out.println("----------------------------");
+
+    } catch (Exception e) {
         e.printStackTrace();
     }
 }
-   static void generateMaintenance(){
-    try(Connection con=getCon()){
 
-        PreparedStatement ps=con.prepareStatement(
-        "SELECT site_id,sqft,status FROM sites");
-        ResultSet rs=ps.executeQuery();
+   
+    // ---------------- MENUS ----------------
+    static Scanner sc = new Scanner(System.in);
+    static UserDAO userDAO = new UserDAOImpl();
+    static SiteDAO siteDAO = new SiteDAOImpl();
 
-        while(rs.next()){
-            int id=rs.getInt(1);
-            int sqft=rs.getInt(2);
-            String status=rs.getString(3);
+    static void adminMenu(User admin) {
+        while (true) {
+            System.out.println("\nADMIN MENU");
+            System.out.println("1.View All Sites");
+            System.out.println("2.Assign Owner");
+            System.out.println("3.Collect Payment");
+            System.out.println("4.View Pending");
+            System.out.println("5.Register Owner");
+            System.out.println("6.Exit");
+            int ch = sc.nextInt();
 
-            double amount=calculateMaintenance(sqft,status);
-
-            PreparedStatement upd=con.prepareStatement(
-            "UPDATE sites SET maintenance_due=? WHERE site_id=?");
-            upd.setDouble(1,amount);
-            upd.setInt(2,id);
-            upd.executeUpdate();
-        }
-
-        System.out.println("Maintenance Generated");
-
-    }catch(Exception e){e.printStackTrace();}
-}
-
-    static void collectMaintenance(){
-    try(Connection con=getCon()){
-        Scanner sc=new Scanner(System.in);
-
-        ResultSet rs=con.createStatement().executeQuery(
-        "SELECT site_id,owner_id,maintenance_due FROM sites WHERE maintenance_due>0");
-
-        boolean found=false;
-        while(rs.next()){
-            found=true;
-            System.out.println(
-            rs.getInt(1)+" "+
-            rs.getInt(2)+" "+
-            rs.getDouble(3));
-        }
-
-        if(!found){
-            System.out.println("No Pending Maintenance");
-            return;
-        }
-
-        System.out.print("Enter Site ID to Collect: ");
-        int id=sc.nextInt();
-
-        PreparedStatement ps=con.prepareStatement(
-        "UPDATE sites SET maintenance_due=0 WHERE site_id=?");
-        ps.setInt(1,id);
-        ps.executeUpdate();
-
-        System.out.println("Maintenance Collected");
-
-    }catch(Exception e){e.printStackTrace();}
-}
-  
-    static double calculateMaintenance(int sqft, String status){
-    if(status.equalsIgnoreCase("OPEN"))
-        return sqft * 6;
-    else
-        return sqft * 9;
-}
-
-    static boolean showPending(){
-         boolean found = false;
-        try(Connection con=getCon()){
-            ResultSet rs=con.createStatement().executeQuery(
-            "SELECT * FROM site_requests WHERE status='PENDING'");
-            while(rs.next()){
-                found = true;
-                System.out.println(
-                rs.getInt("req_id")+" "+
-                rs.getInt("owner_id")+" "+
-                rs.getString("site_type")+" "+
-                rs.getString("size")+" "+
-                rs.getInt("sqft"));
+            switch (ch) {
+                case 1 -> siteDAO.getAllSites().forEach(s -> printSite(s));
+                case 2 -> {
+                    System.out.print("Site No:");
+                    int sn = sc.nextInt();
+                    showAllOwners();
+                    System.out.print("Owner ID:");
+                    int oid = sc.nextInt();
+                    System.out.print("Type(VILLA/APARTMENT/HOUSE):");
+                    String t = sc.next();
+                    siteDAO.assignOwner(sn, oid, t);
+                }
+                case 3 -> {
+                    System.out.print("Site:");
+                    int sn = sc.nextInt();
+                    System.out.print("Amount:");
+                    int amt = sc.nextInt();
+                    siteDAO.collectPayment(sn, amt);
+                }
+                case 4 -> siteDAO.getPendingSites().forEach(s -> printSite(s));
+                case 5 -> {
+                    System.out.print("Username:");
+                    String u = sc.next();
+                    System.out.print("Password:");
+                    String p = sc.next();
+                    userDAO.registerOwner(u, p);
+                }
+                case 6 -> { return; }
             }
-           if (!found)
-            System.out.println("No Pending Requests");
-        }catch(Exception e){e.printStackTrace();}
-    return found;
+        }
     }
 
-    static void approve(){
-        try(Connection con=getCon()){
-            Scanner sc=new Scanner(System.in);
-            if(!showPending()) return; 
-            
-            System.out.print("Req ID:");
-            int id=sc.nextInt();
+    static void ownerMenu(User owner) {
+        while (true) {
+            System.out.println("\nOWNER MENU");
+            System.out.println("1.View My Site");
+            System.out.println("2.Request Property Update");
+            System.out.println("3.Exit");
+            int ch = sc.nextInt();
 
-            PreparedStatement get=con.prepareStatement(
-            "SELECT owner_id,site_type,size,sqft FROM site_requests WHERE req_id=?");
-            get.setInt(1,id);
-            ResultSet rs=get.executeQuery();
-
-            if(rs.next()){
-                PreparedStatement ins=con.prepareStatement(
-                "INSERT INTO sites(owner_id,site_type,size,sqft) VALUES(?,?,?,?)");
-                ins.setInt(1,rs.getInt(1));
-                ins.setString(2,rs.getString(2));
-                ins.setString(3,rs.getString(3));
-                ins.setInt(4,rs.getInt(4));
-                ins.executeUpdate();
-
-                PreparedStatement upd=con.prepareStatement(
-                "UPDATE site_requests SET status='APPROVED' WHERE req_id=?");
-                upd.setInt(1,id);
-                upd.executeUpdate();
-
-                System.out.println("Approved");
+            switch (ch) {
+                case 1 -> siteDAO.getOwnerSites(owner.id).forEach(s -> printSite(s));
+                case 2 -> {
+                  
+    
+                    System.out.print("Site No:");
+                    int sn = sc.nextInt();
+                    System.out.print("New Type:");
+                    String t = sc.next();
+                    siteDAO.requestUpdate(sn, t);
+                }
+                case 3 -> { return; }
             }
-        }catch(Exception e){e.printStackTrace();}
-    }
-
-    static void reject(){
-        try(Connection con=getCon()){
-            Scanner sc=new Scanner(System.in);
-            if(!showPending()) return; 
-            
-            System.out.print("Req ID:");
-            int id=sc.nextInt();
-
-            PreparedStatement ps=con.prepareStatement(
-            "UPDATE site_requests SET status='REJECTED' WHERE req_id=?");
-            ps.setInt(1,id);
-            ps.executeUpdate();
-            System.out.println("Rejected");
-        }catch(Exception e){e.printStackTrace();}
-    }
-
-    // ---------- MENUS ----------
-    static void ownerMenu(int id){
-        Scanner sc=new Scanner(System.in);
-        while(true){
-            System.out.println("\n1.Add Site 2.View approved Site 3.View Requests 4.Exit");
-            int ch=sc.nextInt(); sc.nextLine();
-            if(ch==1) addSite(id);
-            
-            else if(ch==2) viewMySite(id);
-            else if(ch==3) viewMyRequests(id);
-            else return;
         }
     }
 
-    static void adminMenu(){
-        Scanner sc=new Scanner(System.in);
-        while(true){
-            System.out.println("\n 1.Add Owner 2.Remove Owner 3.View Sites 4.Approve 5.Reject 6.Generate Maintenance 7.Collect Maintenance 8.Exit");
-            int ch=sc.nextInt();
-            if(ch==1) addOwner();
-            else if(ch==2) removeOwner();
-            else if(ch==3) viewAllSites();
-            else if(ch==4) approve();
-            else if(ch==5) reject();
-            else if(ch==6) generateMaintenance();
-            else if(ch==7) collectMaintenance();
-            else return;
-        }
+    static void printSite(Site s) {
+        System.out.println(s.siteNo + " | " + s.dimension + " | " +
+                s.propertyType + " | Balance:" + s.balance + " | " + s.status);
     }
 
-    // ---------- MAIN ----------
-    public static void main(String[] args){
-        Scanner sc=new Scanner(System.in);
-        System.out.println("1.Admin 2.Owner");
-        int role=sc.nextInt(); sc.nextLine();
+    // ---------------- MAIN ----------------
+   public static void main(String[] args) {
 
-        if(role==1){
-            System.out.print("Username:");
-            String u=sc.nextLine();
-            System.out.print("Password:");
-            String p=sc.nextLine();
-            if(adminLogin(u,p)) adminMenu();
-            else System.out.println("Invalid Admin");
+    while (true) {
+
+        System.out.println("\n==== LAYOUT MAINTENANCE APPLICATION ====");
+        System.out.println("1. Admin Login");
+        System.out.println("2. Owner Login");
+        System.out.println("3. Exit");
+        System.out.print("Select Role: ");
+        int roleChoice = sc.nextInt();
+
+        if (roleChoice == 3) {
+            System.out.println("Thank You!");
+            break;
+        }
+
+        System.out.print("Username: ");
+        String u = sc.next();
+
+        System.out.print("Password: ");
+        String p = sc.next();
+
+        User user = userDAO.login(u, p);
+
+        if (user == null) {
+            System.out.println("Invalid Credentials!");
+            continue;
+        }
+
+        // Role validation
+        if (roleChoice == 1 && user.role.equals("ADMIN")) {
+            adminMenu(user);
+
+        } else if (roleChoice == 2 && user.role.equals("OWNER")) {
+            ownerMenu(user);
+
         } else {
-            System.out.print("Username:");
-            String u=sc.nextLine();
-            System.out.print("Password:");
-            String p=sc.nextLine();
-            int id=ownerLogin(u,p);
-            if(id!=-1) ownerMenu(id);
-            else System.out.println("Invalid Owner");
+            System.out.println("Role Mismatch! Access Denied.");
         }
     }
+}
+
 }
