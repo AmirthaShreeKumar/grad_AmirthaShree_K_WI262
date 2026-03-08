@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABC Premium Bank | Secure SPA</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --slate-dark: #243447;
+            --gold-accent: #d4af37;
+            --soft-white: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #ffffff;
+            color: var(--slate-dark);
+            margin: 0;
+        }
+
+        h1, h2, .navbar-brand {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: var(--slate-dark) !important;
+            border-bottom: 4px solid var(--gold-accent);
+            padding: 15px 0;
+        }
+
+        .nav-link {
+            color: white !important;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--gold-accent) !important;
+        }
+
+        /* SPA Section Display */
+        .section {
+            display: none;
+            padding: 60px 0;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Home Hero Section */
+        .hero-banner {
+            background: linear-gradient(rgba(36, 52, 71, 0.7), rgba(36, 52, 71, 0.7)), 
+                        url('https://images.pexels.com/photos/259209/pexels-photo-259209.jpeg?auto=compress&cs=tinysrgb&w=1600');
+            background-size: cover;
+            background-position: center;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* Service Cards */
+        .card {
+            border: none;
+            border-radius: 15px;
+            transition: 0.4s;
+            background: var(--soft-white);
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+        }
+
+        .service-img {
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .btn-gold {
+            background-color: var(--gold-accent);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-weight: 600;
+            border: none;
+        }
+
+        .btn-gold:hover {
+            background-color: #b8962d;
+            color: white;
+        }
+
+        /* Responsive image in About section */
+        .about-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        footer {
+            background-color: var(--slate-dark);
+            color: white;
+            padding: 50px 0;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+
+<body onload="showSection('home')">
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand fs-3 fw-bold" href="#" onclick="showSection('home')">ABC BANK</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('home')">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('about')">About Us</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('services')">Services</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('netbanking')">NetBanking</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('contact')">Contact</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <div id="home" class="section">
+        <div class="hero-banner shadow text-center p-4">
+            <div>
+                <h1 class="display-2 fw-bold mb-3">Excellence in Banking</h1>
+                <p class="fs-4 mb-4">Trusted by millions since 2000. Your secure future starts here.</p>
+                <button class="btn btn-gold btn-lg" onclick="showSection('services')">Explore Services</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="about" class="section">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h2 class="display-4 fw-bold text-dark mb-4">Our Heritage</h2>
+                <p class="lead">Established in 2000, ABC Bank has been the cornerstone of financial growth for thousands of families and businesses.</p>
+                <p>We pride ourselves on maintaining the highest standards of digital security while providing a personal touch that modern "app-only" banks often lose.</p>
+                <div class="p-3 border-start border-4 border-warning bg-light mt-4">
+                    <p class="fst-italic mb-0">"Banking is not just about numbers; it's about the people behind them."</p>
+                </div>
+            </div>
+            <div class="col-md-6 mt-4 mt-md-0">
+                <img src="https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg?auto=compress&cs=tinysrgb&w=800" 
+                     class="about-image" 
+                     alt="Bank Staff Working">
+            </div>
+        </div>
+    </div>
+
+    <div id="services" class="section">
+        <h2 class="text-center display-5 mb-5 fw-bold">Our Financial Products</h2>
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <img src="https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=600" class="service-img" alt="Home Loan">
+                    <div class="card-body">
+                        <i class="bi bi-bank fs-1 text-warning mb-2"></i>
+                        <h4 class="fw-bold">Loan Services</h4>
+                        <p class="text-muted">Competitive rates for Home, Car, and Personal loans with easy EMIs.</p>
+                        <button class="btn btn-outline-dark" onclick="showServiceDetail('loan')">Learn More</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <img src="https://images.pexels.com/photos/4386442/pexels-photo-4386442.jpeg?auto=compress&cs=tinysrgb&w=600" class="service-img" alt="Savings">
+                    <div class="card-body">
+                        <i class="bi bi-wallet2 fs-1 text-warning mb-2"></i>
+                        <h4 class="fw-bold">Secure Deposits</h4>
+                        <p class="text-muted">High-yield Fixed and Recurring Deposits to grow your savings safely.</p>
+                        <button class="btn btn-outline-dark" onclick="showServiceDetail('deposit')">Learn More</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <img src="https://images.pexels.com/photos/5632371/pexels-photo-5632371.jpeg?auto=compress&cs=tinysrgb&w=600" class="service-img" alt="Account">
+                    <div class="card-body">
+                        <i class="bi bi-person-plus fs-1 text-warning mb-2"></i>
+                        <h4 class="fw-bold">Instant Accounts</h4>
+                        <p class="text-muted">Open your Savings or Current account in 5 minutes via digital KYC.</p>
+                        <button class="btn btn-outline-dark" onclick="showServiceDetail('account')">Learn More</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="serviceDetailArea" class="mt-5"></div>
+    </div>
+
+    <div id="netbanking" class="section">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card shadow-lg p-4 border-0">
+                    <h2 class="text-center mb-4">Secure Gateway</h2>
+                    <div class="btn-group w-100 mb-4 shadow-sm">
+                        <button class="btn btn-gold" onclick="showLogin()">Login</button>
+                        <button class="btn btn-dark" onclick="showSignup()">Sign Up</button>
+                    </div>
+                    <div id="formArea">
+                        <div class="alert alert-warning text-center">Select an option to access your vault.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="contact" class="section">
+        <div class="row">
+            <div class="col-md-6">
+                <h2 class="display-5 fw-bold mb-4">Visit Our Headquarters</h2>
+                <img src="https://images.pexels.com/photos/374074/pexels-photo-374074.jpeg?auto=compress&cs=tinysrgb&w=800" 
+                     class="img-fluid rounded shadow mb-4" 
+                     alt="Office Building">
+                <p><i class="bi bi-geo-alt-fill text-warning me-2"></i> 101 Financial Plaza, Chennai, TN - 600001</p>
+                <p><i class="bi bi-telephone-fill text-warning me-2"></i> +91 98765 43210</p>
+                <p><i class="bi bi-envelope-fill text-warning me-2"></i> support@abcbank.com</p>
+            </div>
+            <div class="col-md-6">
+                <div class="card p-4 shadow-sm">
+                    <h3 class="mb-4">Send a Message</h3>
+                    <input type="text" class="form-control mb-3" placeholder="Full Name">
+                    <input type="email" class="form-control mb-3" placeholder="Email Address">
+                    <textarea class="form-control mb-3" rows="5" placeholder="Your Inquiry..."></textarea>
+                    <button class="btn btn-gold w-100">Send Inquiry</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer class="text-center">
+    <div class="container">
+        <h3>ABC BANK</h3>
+        <p class="opacity-50 mt-2">© 2026 ABC Banking Group. Secure | Reliable | Digital.</p>
+        <div class="fs-3 mt-3">
+            <i class="bi bi-facebook mx-2"></i>
+            <i class="bi bi-twitter-x mx-2"></i>
+            <i class="bi bi-linkedin mx-2"></i>
+        </div>
+    </div>
+</footer>
+
+<script>
+    function showSection(id) {
+        let sections = document.querySelectorAll('.section');
+        sections.forEach(s => s.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
+        window.scrollTo(0,0);
+        
+        // Clear sub-content areas
+        if(id !== 'services') document.getElementById('serviceDetailArea').innerHTML = '';
+    }
+
+    function showServiceDetail(type) {
+        let area = document.getElementById('serviceDetailArea');
+        let info = {
+            loan: "Our Home Loans start at 8.5% p.a. Flexible tenure up to 30 years with minimal documentation.",
+            deposit: "Earn up to 7.25% p.a. on Fixed Deposits. Senior citizens get an extra 0.50% interest.",
+            account: "Zero balance savings accounts available for students. Includes a free Platinum Visa card."
+        };
+        area.innerHTML = `
+            <div class="alert alert-secondary p-4 shadow-sm border-0 border-start border-4 border-warning">
+                <h4 class="text-uppercase fw-bold">${type} Details</h4>
+                <p>${info[type]}</p>
+                <button class="btn btn-sm btn-dark">Download Rates PDF</button>
+            </div>
+        `;
+    }
+
+    function showLogin() {
+        document.getElementById('formArea').innerHTML = `
+            <label class="form-label mt-2">Customer ID</label>
+            <input type="text" class="form-control mb-3" placeholder="Enter ID">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control mb-3" placeholder="••••••••">
+            <button class="btn btn-gold w-100">Login Securely</button>
+        `;
+    }
+
+    function showSignup() {
+        document.getElementById('formArea').innerHTML = `
+            <input type="text" class="form-control mb-2" placeholder="Full Name">
+            <input type="email" class="form-control mb-2" placeholder="Email">
+            <input type="tel" class="form-control mb-2" placeholder="Mobile">
+            <button class="btn btn-dark w-100 mt-2">Start Registration</button>
+        `;
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

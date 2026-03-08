@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Loan Calculator</title>
+
+    <script>
+
+        function calculateEMI()
+        {
+            let name = document.getElementById("applicant").value;
+            let type = document.querySelector('input[name="type"]:checked').value;
+            let amount = parseFloat(document.getElementById("amount").value);
+            let years = parseInt(document.getElementById("duration").value);
+
+            let interest = 0;
+            let valid = true;
+            let message = "";
+
+            
+
+            if (type === "home") {
+                interest = 9;
+
+                if (amount < 500000) {
+                    valid = false;
+                    message = "Home loan amount must be above 5 Lakhs.";
+                }
+
+                if (years > 30) {
+                    valid = false;
+                    message = "Home loan duration max is 30 years.";
+                }
+            }
+
+            if (type === "car") {
+                interest = 12;
+
+                if (amount < 100000) {
+                    valid = false;
+                    message = "Car loan amount must be above 1 Lakh.";
+                }
+
+                if (years > 7) {
+                    valid = false;
+                    message = "Car loan duration max is 7 years.";
+                }
+            }
+
+            if (type === "personal") {
+                interest = 15;
+
+                if (amount < 10000) {
+                    valid = false;
+                    message = "Personal loan minimum is 10,000.";
+                }
+
+                if (years > 5) {
+                    valid = false;
+                    message = "Personal loan duration max is 5 years.";
+                }
+            }
+
+            if (!valid) {
+                document.getElementById("result").innerText = message;
+                return;
+            }
+
+            // EMI Calculation
+            let monthlyRate = (interest / 100) / 12;
+            let months = years * 12;
+
+            let emi = (amount * monthlyRate * Math.pow(1 + monthlyRate, months)) /
+                      (Math.pow(1 + monthlyRate, months) - 1);
+
+            document.getElementById("result").innerText =
+                "Applicant: " + name +
+                " | Loan Type: " + type.toUpperCase() +
+                " | EMI: ₹ " + emi.toFixed(2);
+        }
+
+    </script>
+</head>
+
+<body style="text-align:center; font-family:Arial;">
+
+    <h2>LOAN CALCULATOR</h2>
+    <hr>
+
+    Applicant :
+    <input type="text" id="applicant"><br><br>
+
+    Type :
+    <input type="radio" name="type" value="home" checked> HOME
+    <input type="radio" name="type" value="car"> CAR
+    <input type="radio" name="type" value="personal"> PERSONAL
+    <br><br>
+
+    Amount :
+    <input type="number" id="amount"><br><br>
+
+    Duration (Years) :
+    <input type="number" id="duration"><br><br>
+
+    <button onclick="calculateEMI()">CALCULATE EMI</button>
+
+    <h3 id="result"></h3>
+
+</body>
+</html>
