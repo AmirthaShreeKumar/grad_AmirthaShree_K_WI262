@@ -1,5 +1,19 @@
 # StudentManagementApp
 
+Simple Angular SPA for managing student records. Features:
+
+- Login screen with role selection (admin or staff)
+- Admin users can add, edit and delete students
+- Staff users can only view the list of students
+- In-memory data store via a service (no backend)
+
+**Credentials:**
+
+- For **admin** role, any username works but password must be `admin123`. This simple check prevents anyone from merely selecting "admin" and gaining full control; the password acts as the single credential that distinguishes an actual administrator from a staff user.
+- For **staff** role, any username/password combination is accepted.
+
+This repo can be cloned and run locally as described below.
+
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.0.
 
 ## Development server
