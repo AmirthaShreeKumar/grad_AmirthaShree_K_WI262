@@ -1,0 +1,33 @@
+<div class="container">
+  <h2 class="mb-3">Student List</h2>
+
+  <div class="mb-3">
+    <a *ngIf="role=='admin'" routerLink="/add" class="btn btn-primary">Add Student</a>
+  </div>
+
+  <table class="table table-striped table-bordered">
+    <thead class="table-dark">
+      <tr>
+        <th>RegNo</th>
+        <th>RollNo</th>
+        <th>Name</th>
+        <th>Standard</th>
+        <th>School</th>
+        <th *ngIf="role=='admin'">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let s of students">
+        <td>{{s.regNo}}</td>
+        <td>{{s.rollNo}}</td>
+        <td>{{s.name}}</td>
+        <td>{{s.standard}}</td>
+        <td>{{s.school}}</td>
+        <td *ngIf="role=='admin'">
+          <button (click)="delete(s.regNo)" class="btn btn-danger btn-sm me-1">Delete</button>
+          <button routerLink="/edit/{{s.regNo}}" class="btn btn-secondary btn-sm">Edit</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

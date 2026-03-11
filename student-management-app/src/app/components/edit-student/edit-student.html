@@ -1,0 +1,26 @@
+<div class="d-flex justify-content-center">
+  <div class="card p-4" style="width:100%; max-width:500px;">
+    <h2 class="mb-4">Edit Student</h2>
+    <div class="mb-3">
+      <label class="form-label">RegNo</label>
+      <input [(ngModel)]="student.regNo" class="form-control" disabled>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">RollNo</label>
+      <input [(ngModel)]="student.rollNo" class="form-control">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Name</label>
+      <input [(ngModel)]="student.name" class="form-control">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Standard</label>
+      <input [(ngModel)]="student.standard" class="form-control">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">School</label>
+      <input [(ngModel)]="student.school" class="form-control">
+    </div>
+    <button (click)="save()" class="btn btn-primary">Save</button>
+  </div>
+</div>
