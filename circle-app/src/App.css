@@ -1,0 +1,38 @@
+body{
+  margin:0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(135deg,#4facfe,#00f2fe);
+}
+
+.container{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.card{
+  background:white;
+  padding:30px;
+  width:320px;
+  border-radius:12px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.2);
+}
+
+h2{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+input{
+  width:100%;
+  padding:10px;
+  font-size:16px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  margin-bottom:20px;
+}
+
+.result p{
+  margin:8px 0;
+}
