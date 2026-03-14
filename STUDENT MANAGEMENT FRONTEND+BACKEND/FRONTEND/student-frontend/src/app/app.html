@@ -1,0 +1,14 @@
+<div class="app-container">
+  <nav class="nav-bar">
+    <div class="nav-title">📚 Student Management System</div>
+    <div class="nav-links">
+      <a routerLink="/students" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">📋 Student List</a>
+      <a routerLink="/add-student" routerLinkActive="active">➕ Add Student</a>
+      <a routerLink="/statistics" routerLinkActive="active">📊 Statistics</a>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <router-outlet></router-outlet>
+  </div>
+</div>

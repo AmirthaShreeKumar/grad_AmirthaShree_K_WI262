@@ -1,0 +1,88 @@
+<div class="page-container">
+
+  <div class="form-card">
+
+    <div class="form-header">
+      <h2>➕ Add New Student</h2>
+      <p>Enter the complete student details below to add to the system</p>
+    </div>
+
+    <form (ngSubmit)="saveStudent()">
+
+      <div class="grid">
+
+        <div class="form-group">
+          <label>Registration Number</label>
+          <input type="number" [(ngModel)]="student.regNo" name="regNo" placeholder="Enter reg number" required>
+        </div>
+
+        <div class="form-group">
+          <label>Roll Number</label>
+          <input type="number" [(ngModel)]="student.rollNo" name="rollNo" placeholder="Enter roll number" required>
+        </div>
+
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" [(ngModel)]="student.name" name="name" placeholder="Enter student name" required>
+        </div>
+
+        <div class="form-group">
+          <label>School</label>
+          <input type="text" [(ngModel)]="student.school" name="school" placeholder="Enter school name" required>
+        </div>
+
+        <div class="form-group">
+          <label>Standard (Grade)</label>
+          <input type="number" [(ngModel)]="student.standard" name="standard" min="1" max="12" placeholder="1-12" required>
+        </div>
+
+        <div class="form-group">
+          <label>Percentage</label>
+          <input type="number" [(ngModel)]="student.percentage" name="percentage" min="0" max="100" step="0.01" placeholder="0-100" required>
+        </div>
+
+        <div class="form-group">
+          <label>Gender</label>
+          <select [(ngModel)]="student.gender" name="gender" required>
+            <option value="">-- Select Gender --</option>
+            <option value="MALE">Male</option>
+            <option value="FEMALE">Female</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="button-group">
+        <button type="submit" class="btn btn-primary">💾 Save Student</button>
+        <button type="button" routerLink="/students" class="btn btn-secondary">← Back to List</button>
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+<style scoped>
+  .page-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-start;
+    margin-top: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .button-group {
+      flex-direction: column;
+    }
+
+    .button-group button {
+      width: 100%;
+    }
+  }
+</style>

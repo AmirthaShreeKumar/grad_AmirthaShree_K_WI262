@@ -1,0 +1,112 @@
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+.list-card {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.list-header h2 {
+  margin: 0;
+  color: #1e3c72;
+}
+
+.list-header p {
+  margin: 5px 0 0 0;
+  color: #666;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+th {
+  background: #4a90e2;
+  color: white;
+  padding: 10px;
+  text-align: left;
+}
+
+td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+tr:hover {
+  background: #f5f7ff;
+}
+
+.badge {
+  background: linear-gradient(90deg,#667eea,#764ba2);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+.percentage {
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 5px;
+}
+
+.percentage.high {
+  background: rgba(17,153,142,0.2);
+  color: #11998e;
+}
+
+.percentage.medium {
+  background: rgba(241,196,15,0.2);
+  color: #f39c12;
+}
+
+.percentage.low {
+  background: rgba(231,76,60,0.2);
+  color: #e74c3c;
+}
+
+.gender-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+.gender-badge.male {
+  background: rgba(52,152,219,0.2);
+  color: #2980b9;
+}
+
+.gender-badge.female {
+  background: rgba(231,76,60,0.2);
+  color: #e74c3c;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.loading {
+  text-align: center;
+  padding: 30px;
+  color: #666;
+}

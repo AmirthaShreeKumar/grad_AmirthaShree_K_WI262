@@ -1,0 +1,73 @@
+<h2>Student Statistics & Advanced Features</h2>
+
+<hr>
+
+<h3>1. Students by School</h3>
+<input type="text" [(ngModel)]="schoolName" placeholder="Enter school name (e.g., KV, DPS)">
+<button (click)="getStudentsBySchool()">Get Students</button>
+<button (click)="getSchoolCount()">Get School Count</button>
+
+<div *ngIf="schoolStudents.length > 0">
+  <h4>Students in {{schoolName}}:</h4>
+  <table border="1">
+    <tr>
+      <th>RegNo</th><th>Name</th><th>Standard</th><th>Percentage</th>
+    </tr>
+    <tr *ngFor="let student of schoolStudents">
+      <td>{{student.regNo}}</td>
+      <td>{{student.name}}</td>
+      <td>{{student.standard}}</td>
+      <td>{{student.percentage}}</td>
+    </tr>
+  </table>
+</div>
+
+<div *ngIf="schoolCount > 0">
+  <p><strong>Total students in {{schoolName}}: {{schoolCount}}</strong></p>
+</div>
+
+<hr>
+
+<h3>2. Students by Standard Count</h3>
+<input type="number" [(ngModel)]="standard" min="1" max="12">
+<button (click)="getStandardCount()">Get Count</button>
+<p *ngIf="standardCount >= 0"><strong>Students in Standard {{standard}}: {{standardCount}}</strong></p>
+
+<hr>
+
+<h3>3. Students by Result (Pass/Fail)</h3>
+<select [(ngModel)]="passFilter">
+  <option [value]="true">Pass (40%+)</option>
+  <option [value]="false">Fail (<40%)</option>
+</select>
+<button (click)="getStudentsByResult()">Get Results</button>
+
+<div *ngIf="resultStudents.length > 0">
+  <h4>{{passFilter ? 'Pass' : 'Fail'}} Students:</h4>
+  <table border="1">
+    <tr>
+      <th>RegNo</th><th>Name</th><th>Percentage</th><th>Result</th>
+    </tr>
+    <tr *ngFor="let student of resultStudents">
+      <td>{{student.regNo}}</td>
+      <td>{{student.name}}</td>
+      <td>{{student.percentage}}</td>
+      <td>{{student.percentage >= 40 ? 'PASS' : 'FAIL'}}</td>
+    </tr>
+  </table>
+</div>
+
+<hr>
+
+<h3>4. Strength by Gender & Standard</h3>
+<select [(ngModel)]="gender">
+  <option value="MALE">Male</option>
+  <option value="FEMALE">Female</option>
+</select>
+<input type="number" [(ngModel)]="standard" min="1" max="12" placeholder="Standard">
+<button (click)="getStrengthByGenderAndStandard()">Get Strength</button>
+<p *ngIf="strengthCount >= 0"><strong>{{gender}} students in Standard {{standard}}: {{strengthCount}}</strong></p>
+
+<hr>
+
+<a routerLink="/students">Back to Student List</a>

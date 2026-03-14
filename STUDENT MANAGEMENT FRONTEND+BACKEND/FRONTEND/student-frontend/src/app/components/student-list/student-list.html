@@ -1,0 +1,80 @@
+<div class="page-container">
+
+  <div class="list-card">
+
+    <div class="list-header">
+  <div>
+    <h2>📋 Student List</h2>
+    <p>Manage and view all registered students</p>
+  </div>
+</div>
+
+    <!-- Loading State -->
+    <div *ngIf="!students" class="loading">
+      <div class="spinner"></div>
+      <p>Loading students...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="students && students.length === 0" class="empty-state">
+      <div class="empty-icon">📚</div>
+      <h3>No Students Found</h3>
+      <p>Start by adding a new student to the system.</p>
+      <button class="btn btn-primary" routerLink="/add-student">➕ Add First Student</button>
+    </div>
+
+    <!-- Students Table -->
+    <div *ngIf="students && students.length > 0" class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Reg No</th>
+            <th>Roll No</th>
+            <th>Name</th>
+            <th>School</th>
+            <th>Standard</th>
+            <th>Percentage</th>
+            <th>Gender</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let student of students">
+            <td><strong>{{ student.regNo }}</strong></td>
+            <td>{{ student.rollNo }}</td>
+            <td>{{ student.name }}</td>
+            <td>{{ student.school }}</td>
+            <td><span class="badge">{{ student.standard }}</span></td>
+            <td>
+              <span class="percentage" [ngClass]="getPercentageClass(student.percentage)">
+                {{ student.percentage }}%
+              </span>
+            </td>
+            <td>
+              <span class="gender-badge" [ngClass]="student.gender?.toLowerCase()">
+               {{ student.gender?.toLowerCase() === 'male' ? '👨' : '👩' }}
+              </span>
+            </td>
+            <td class="actions">
+              <button
+                class="btn btn-success"
+                (click)="updateStudent(student.regNo)"
+                title="Edit student">
+                ✏️ Edit
+              </button>
+              <button
+                class="btn btn-danger"
+                (click)="deleteStudent(student.regNo)"
+                title="Delete student">
+                🗑️ Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
+

@@ -1,0 +1,122 @@
+<div class="page-container">
+
+  <div class="form-card">
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading student data...</p>
+    </div>
+
+    <!-- Form -->
+    <div *ngIf="!isLoading && student.regNo" class="form-wrapper">
+
+      <div class="form-header">
+        <h2>✏️ Update Student</h2>
+        <p>Registration #{{ student.regNo }} - Update student information</p>
+      </div>
+
+      <form (ngSubmit)="updateStudent()">
+
+        <div class="grid">
+
+          <div class="form-group">
+            <label>Registration Number</label>
+            <input type="number" [(ngModel)]="student.regNo" name="regNo" disabled class="disabled-field">
+            <small>Cannot be changed</small>
+          </div>
+
+          <div class="form-group">
+            <label>Roll Number</label>
+            <input type="number" [(ngModel)]="student.rollNo" name="rollNo" placeholder="Enter roll number">
+          </div>
+
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" [(ngModel)]="student.name" name="name" placeholder="Enter name">
+          </div>
+
+          <div class="form-group">
+            <label>School</label>
+            <input type="text" [(ngModel)]="student.school" name="school" placeholder="Enter school">
+          </div>
+
+          <div class="form-group">
+            <label>Standard (Grade)</label>
+            <input type="number" [(ngModel)]="student.standard" name="standard" min="1" max="12" placeholder="1-12">
+          </div>
+
+          <div class="form-group">
+            <label>Percentage</label>
+            <input type="number" [(ngModel)]="student.percentage" name="percentage" min="0" max="100" step="0.01" placeholder="0-100">
+          </div>
+
+          <div class="form-group">
+            <label>Gender</label>
+            <select [(ngModel)]="student.gender" name="gender">
+              <option value="">-- Select Gender --</option>
+              <option value="MALE">Male</option>
+              <option value="FEMALE">Female</option>
+            </select>
+          </div>
+
+        </div>
+
+        <div class="button-group">
+          <button type="submit" class="btn btn-primary">💾 Update Student</button>
+          <button type="button" routerLink="/students" class="btn btn-secondary">← Back to List</button>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</div>
+
+<style scoped>
+  .page-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .loading-state {
+    text-align: center;
+    padding: 3rem 2rem;
+  }
+
+  .loading-state p {
+    margin-top: 1rem;
+    color: #666;
+  }
+
+  .disabled-field {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+  }
+
+  small {
+    display: block;
+    font-size: 0.75rem;
+    color: #999;
+    margin-top: 0.25rem;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-start;
+    margin-top: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .button-group {
+      flex-direction: column;
+    }
+
+    .button-group button {
+      width: 100%;
+    }
+  }
+</style>
